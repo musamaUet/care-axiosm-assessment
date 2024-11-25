@@ -2,11 +2,20 @@ import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import {} from './user/user.module';
 import { UserModule } from './user/user.module';
+import { ClientsModule, Transport } from '@nestjs/microservices';
 
 @Module({
   imports: [
+    ClientsModule.register({
+      name: 'MESSAGE_QUEUE',
+      transport: Transport.RMQ,
+      options: {
+        urls: ['amqp://localhost:5672'],
+        queue: 'user_queue',
+        queueOptions: { durable: true },
+      },
+    }),
     TypeOrmModule.forRoot({
       type: 'postgres',
       host: 'localhost',
