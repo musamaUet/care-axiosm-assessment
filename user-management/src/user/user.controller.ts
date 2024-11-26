@@ -1,9 +1,9 @@
 import { Controller, Get, Post, Body, Query } from '@nestjs/common';
 import { UserService } from './user.service';
-import { User } from './user.entity';
+import { User } from './entities/user.entity';
 import { CreateUserDto } from './dto/CreateUser.dto';
 
-@Controller('user')
+@Controller('users')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
@@ -13,17 +13,10 @@ export class UserController {
   }
 
   @Get()
-  async getAllUsers(): Promise<User[]> {
-    return this.userService.getAllUsers();
-  }
-
-  @Get('/paginated-over-18')
-  async getPaginatedUsersOver18(
-    @Query('page') page: string,
-    @Query('limit') limit: string,
+  async getAllUsers(
+    @Query('page') page: number = 1,
+    @Query('limit') limit: number = 10,
   ): Promise<User[]> {
-    const pageNumber = parseInt(page, 10) || 1; // Default to page 1 if not provided
-    const limitNumber = parseInt(limit, 10) || 10; // Default to 10 items per page
-    return this.userService.getPaginatedUsersOver18(pageNumber, limitNumber);
+    return this.userService.getAllUsers(page, limit);
   }
 }
