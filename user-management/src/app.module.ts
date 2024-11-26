@@ -3,35 +3,26 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserModule } from './user/user.module';
-// import { ClientsModule, Transport } from '@nestjs/microservices';
-import { ErrorMiddleware } from './common/middleware/error.middleware';
 import { CacheModule } from '@nestjs/cache-manager';
+// import * as redisStore from 'cache-manager-redis-store';
+import { ErrorMiddleware } from './common/middleware/error.middleware';
 
 @Module({
   imports: [
     CacheModule.register({
       store: 'redis',
-      port: 6379,
-      host: 'localhost',
+      host: process.env.REDIS_HOST || 'redis', // Docker service name
+      port: parseInt(process.env.REDIS_PORT) || 6379,
     }),
-    // ClientsModule.register({
-    //   name: 'MESSAGE_QUEUE',
-    //   transport: Transport.RMQ,
-    //   options: {
-    //     urls: ['amqp://localhost:5672'],
-    //     queue: 'user_queue',
-    //     queueOptions: { durable: true },
-    //   },
-    // }),
     TypeOrmModule.forRoot({
       type: 'postgres',
-      host: 'localhost',
-      port: 5432,
-      username: 'postgres',
-      password: 'usama',
-      database: 'user-management',
+      host: process.env.POSTGRES_HOST || 'postgres', // Docker service name
+      port: parseInt(process.env.POSTGRES_PORT) || 5432,
+      username: process.env.POSTGRES_USER || 'postgres',
+      password: process.env.POSTGRES_PASSWORD || 'password',
+      database: process.env.POSTGRES_DB || 'user-management',
       entities: [__dirname + '/**/*.entity{.ts,.js}'],
-      synchronize: true,
+      synchronize: true, // Disable in production
     }),
     UserModule,
   ],
